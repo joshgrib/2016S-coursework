@@ -1,0 +1,12 @@
+What is an algorithm?
+    An algorithm is a sequence of unambiguous instructions for soling a problem, ie for obaining a required output for any legitimate input in a finite amount of time.
+Important points
+    1. The non-ambiguity requirement for each step of an algorithm cannot be compromised
+    2. The range of inputs for which an algorithm works as to be specified carefully
+    3. The same algorithm can be represented in several different ways
+    4. There may exist several different algorithms for solving the same problem
+
+problem -> algorithm -> computer
+input -> computer -> output
+
+Always ask for more clarification if you need it, especially for interview problems
