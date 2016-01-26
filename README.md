@@ -40,5 +40,4 @@ Notes repo for Spring 2016 - Semester 4
 | 4 | 16S | CS385 - Algorithms                           | 4 |  |
 | 4 | 16S | HHS479 - History of Technology Criticism     | 3 |  |
 | 4 | 16S | HSS175 - Fundamentals of Psychology          | 3 |  |
-| 4 | 16S | HSS371 - Computers and Society               | 3 |  |
 | 4 | 16S | PE200 - Archery                              | 0 |  |
