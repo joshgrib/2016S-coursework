@@ -1,6 +1,0 @@
-15:15:08 **** Incremental Build of configuration Default for project cs385practice ****
-make all 
-g++  -g -Wall -Werror -pedantic-errors -fmessage-length=0  practice.cpp  -o practice  #must be a tab not spaces, then use the variables above to make the command
-
-15:15:08 Build Finished (took 220ms)
-
