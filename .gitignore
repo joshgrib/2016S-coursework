@@ -1,7 +1,8 @@
 #Stuff I added
 .cproject
 .project
-.metadata
+.metadata/*
+.setting/*
 
 # Compiled Object files
 *.slo
