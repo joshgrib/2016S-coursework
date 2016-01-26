@@ -1,0 +1,13 @@
+/*
+ * Josh Gribbon
+ * CS385 - Recitation 1
+ *
+ * I pledge my honor I have abided by the Stevens Honor System
+ */
+#include <iostream>
+using namespace std;
+
+int main(int argc, char *argv[]){
+	cout << "Hello" << endl;
+	return 0;
+}

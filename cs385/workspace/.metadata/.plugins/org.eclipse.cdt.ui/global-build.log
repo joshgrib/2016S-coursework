@@ -1,0 +1,6 @@
+15:23:31 **** Incremental Build of configuration Default for project rec1 ****
+make all 
+g++  -g -Wall -Werror -pedantic-errors -fmessage-length=0  gcd.cpp  -o gcd  #must be a tab not spaces, then use the variables above to make the command
+15:23:33 **** Incremental Build of configuration Default for project rec1 ****
+make all 
+g++  -g -Wall -Werror -pedantic-errors -fmessage-length=0  gcd.cpp  -o gcd  #must be a tab not spaces, then use the variables above to make the command

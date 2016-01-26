@@ -1,0 +1,17 @@
+/*
+ * Josh Gribbon
+ * CS385 - Recitation 1
+ *
+ * I pledge my honor I have abided by the Stevens Honor System
+ */
+#include <iostream>
+#include <sstream>
+using namespace std;
+
+int main(int argc, char *argv[]){
+	istringstream iss(argv[1]);
+	istringstream iss2(argv[2]);
+	cout << iss << "," << iss2 << endl;
+	cout << "Hello" << endl;
+	return 0;
+}

@@ -1,0 +1,60 @@
+/*
+ * Josh Gribbon
+ * CS385 - Recitation 1
+ *
+ * I pledge my honor I have abided by the Stevens Honor System
+ */
+#include <iostream>
+#include <sstream>
+using namespace std;
+
+int gcd_rec(int a, int b){
+	if((a<0) || (b<0)){
+		cerr << "Both number must be positive" << endl;
+		return -1;
+	}
+	if( (a==0) || (b==0)){
+		return 0;
+	}
+
+}
+/*
+function gcd(a, b)
+    while b ≠ 0
+       t := b;
+       b := a mod b;
+       a := t;
+    return a;
+ */
+
+int gcd_iter(int a, int b){
+	if((a<0) || (b<0)){
+		cerr << "Both number must be positive" << endl;
+		return -1;
+	}
+	if( (a==0) || (b==0)){
+		return 0;
+	}
+	int c;
+	while(b!=0){
+		c = b;
+		b = a%b;
+		a = c;
+	}
+	return a;
+}
+
+int main(int argc, char *argv[]){
+	istringstream iss(argv[1]);
+	istringstream iss2(argv[2]);
+	int a, b;
+	if(!(iss >> a)){
+		cerr << "Error: The first argument is not a valid integer" << endl;
+	}
+	if(!(iss >> b)){
+			cerr << "Error: The second argument is not a valid integer" << endl;
+		}
+	cout << a << "," << b << endl;
+	cout << "Hello" << endl;
+	return 0;
+}
