@@ -1,0 +1,20 @@
+SEQUENTIAL SEARCH
+Assume:
+    (1) Propability of a successful search is equal to p(0 <= p <= 1)
+    (2) Probability of the first match occuring in the ith position is the same for every i
+With a successful search, the probability of the first match occurring in the ith position in p/n for every i
+Number of comparisons: i
+With an unsuccessful search, the number of comparisons will be n, with the probabiltiy of such a search being 1-p
+Cavg(n) = [ 1*p/n + 2*p/n + 3*p/n + ... + i_p/n + ... + n*p/n] + n*(1-p)
+        = p/n * [1 + 2 + 3 + ... + i + ... + n] + n(1-p)
+        = p/n * [(n*(n+1))/2] + n(1-p)
+        = p(n+1)/2 + n(1-p)
+if p=1 --> search is successful, number of probes is (n+1)/2
+    In other words, if a number is found on average you have to look through half the elements
+if p=0 --> search in unsuccessful, number of probes is n (all of the terms)
+
+Amortized efficiency
+    Does not apply to a single run of the algorithm, but rather to a sequence of operations performed on the same data structure
+    Some situations might be expensive, but the total time to perform n operations is always significant;y better than the worst case efficiency multiplied by n
+    Discovered by Robert Tarjan
+    Ex: Normally inserting into an ArrayList in java is constant time, but if you're at the limit then you need to make a new larger array and copy everything over

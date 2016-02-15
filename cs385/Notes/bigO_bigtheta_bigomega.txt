@@ -1,0 +1,16 @@
+Big O, Big Theta, Big Omega
+
+∎ℕℤℝ∨∧⊆⊂⊈⊄∉∈∩∪⊃⊇⊅⊉Σ≤≥≠∀∃∄¬↔⊕ΩΘ
+
+***THIS WILL BE A QUESTION ON THE FIRST TEST***
+O(g(n)) =
+    { f(n) : ∃ positive constants c and n_0 s.t. 0≤f(n)≤c*g(n)
+    ∀ n ≥ n_0 }
+
+Ω(g(n)) =
+    { f(n) : ∃ positive constants c and n_0 s.t. 0≤c*g(n)≤f(n)
+    ∀ n ≥ n_0 }
+
+Θ(g(n)) =
+    { f(n) : ∃ positive constants c_1, c_2, and n_0 s.t. 0 ≤ c_1*g(n) ≤ f(n) ≤ c_2*g(n)
+    ∀ n ≥ n_0 }

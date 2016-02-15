@@ -1,0 +1,11 @@
+Sieve of Eratosthenes
+An algorithm for finding prime numbers in the range 2-->n
+
+Step 1
+    Mark indices 0 and 1 as false
+Step 2
+    Mark 2-->n as true
+Step 3
+    Starting with i as 2, going up to and including sqrt(n), mark all multiples of j starting at i^2 as false
+Step 4
+    Go to the next true value, and repeat step 3 with a new i value

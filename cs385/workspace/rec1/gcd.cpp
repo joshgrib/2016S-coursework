@@ -9,6 +9,7 @@
 using namespace std;
 
 int gcd_rec(int a, int b) {
+	/*Finds the greatest common denominator of a and b recursively*/
 	if ((a < 0) || (b < 0)) {
 		cerr << "Both numbers must be positive" << endl;
 		return -1;
@@ -21,6 +22,7 @@ int gcd_rec(int a, int b) {
 }
 
 int gcd_iter(int a, int b) {
+	/*Finds the greatest common denominator of a and b iteratively*/
 	if ((a < 0) || (b < 0)) {
 		cerr << "Both numbers must be positive" << endl;
 		return -1;
@@ -39,7 +41,7 @@ int main(int argc, char *argv[]) {
 		cerr << "Usage: ./gcd <integer m> <integer n>" << endl;
 		return 1;
 	}
-	istringstream iss(argv[1]);
+	istringstream iss(argv[1]);//set iss and iss2 and the command line arguments
 	istringstream iss2(argv[2]);
 	int a, b;
 	if (!(iss >> a)) {
