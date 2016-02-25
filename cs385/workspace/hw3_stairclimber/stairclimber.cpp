@@ -24,6 +24,14 @@ vector<vector<int> > get_ways(int num_stairs) {
 	if (num_stairs < 1) { //if there's no steps left
 		bigV.push_back(littleV);
 	}
+	for(int i=0; i<3; i++){
+		if (num_stairs > i) { //if there's i or more steps left
+			littleV.push_back(i+1);//add the steps taken
+			get_ways(num_stairs - (i+1));//get the options for the rest of the steps
+			littleV.pop_back();//remove the last element of the inside vector
+		}
+	}
+	/*
 	if (num_stairs > 0) { //if there's one or more steps left
 		littleV.push_back(1);//add the steps taken
 		get_ways(num_stairs - 1);//get the options for the rest of the steps
@@ -39,6 +47,7 @@ vector<vector<int> > get_ways(int num_stairs) {
 		get_ways(num_stairs - 3);
 		littleV.pop_back();
 	}
+	*/
 	return bigV;
 }
 
