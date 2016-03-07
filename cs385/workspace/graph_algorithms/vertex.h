@@ -36,7 +36,10 @@ struct Vertex {
         return oss.str();
     }
 
-    friend std::ostream& operator<<(
+    friend std::ostream& operator<<(//friend functions are allowed to see the private parts
+    	/**
+    	 * lets you cout a vertex just by having a reference to it
+    	 */
                 std::ostream &os, const Vertex &vertex) {
         os << vertex.to_string();
         os.flush();
