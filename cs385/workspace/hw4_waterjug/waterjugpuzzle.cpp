@@ -24,6 +24,13 @@ using namespace std;
  */
 
 int check_input(char * const argv[6]){
+	/**
+	 * Checks the user input to make sure:
+	 * Inputs are all non-negative integers
+	 * Jug capacities are positive
+	 * Goals are all less than jug capacities
+	 * Total goal gallons are equal to the capacity of jug c
+	 */
     int a_jug, b_jug, c_jug, a_goal, b_goal, c_goal;
     istringstream iss1(argv[1]);
     iss1 >> a_jug;
@@ -80,144 +87,74 @@ int check_input(char * const argv[6]){
     return 0;
 }
 
-class Vertex{
-	/**
-	 * Class to represent a vertex, being a state of the 3 jugs
-	 */
+int a_cap, b_cap, c_cap, a_goal, b_goal, c_goal;//capacities and goals
+
+class State{
 public:
-	int A, B, C;
-	bool checked;
-	explicit Vertex(int A_init, int B_init, int C_init){
-		A = A_init;
-		B = B_init;
-		C = C_init;
-		checked=false;
+	int a_, b_, c_;
+	vector<string> steps;
+	explicit State(int a, int b, int c, vector<string> prevSteps, string newStep) : a_(a), b_(b), c_(c){
+		steps = prevSteps;
+		if(newStep != ""){
+			steps.push_back(newStep);
+		}
+	}
+	vector<string> get_steps(){
+		return steps;
+	}
+	bool is_goal(){
+		if((a_==a_goal) && (b_==b_goal) && (c_==c_goal)){
+			return true;
+		}
+		return false;
 	}
 };
 
+queue<State> bfsQ;
 vector< vector<int> > checked;
-int a_cap, b_cap, c_cap, a_goal, b_goal, c_goal;//capacities and goals
-queue<Vertex> bfsQ;
-stack<Vertex> solution;
+vector<State> checked2;
 
-bool has_solution(int A, int B, int C){
+bool already_checked(vector<int> V){
 	/**
-	 * Accidentally made a DFS but it finds out if there's a solution
-	 * well so I figured I'd use it anyway
+	 * Returns if an integer vector of 3 jug capacities has been checked before
 	 */
-    vector<int> combo;
-    combo.push_back(C);
-    combo.push_back(B);
-    combo.push_back(A);
-    if(find(checked.begin(), checked.end(), combo) != checked.end()){
-        //this combo has been checked before
-        return false;
-    }
-    checked.push_back(combo);
-
-    if((A==a_goal) && (B==b_goal) && (C==c_goal)){
-        //Reached the goal
-        return true;
-    }
-
-    bool result = false;
-
-    int diff;
-
-    //C --> A
-    if((A+C) > a_cap){
-        //all of C can't be poured into A
-        diff = a_cap-A;
-    }else{
-        //all of C can be poured into A
-        diff = C;
-    }
-    if(has_solution(A+diff, B, C-diff) && !result){
-        result = true;
-        ostringstream resp;
-        //cout << "Pour " << diff << " gallons from C to A. (" << A+diff << ", " << B << ", " << C-diff << ")" << endl;
-    }
-
-    //B --> A
-    if((B+A) > a_cap){
-        diff = a_cap-A;
-    }else{
-        diff = B;
-    }
-    if(has_solution(A+diff, B-diff, C) && !result){
-        result = true;
-        //cout << "Pour " << diff << " gallons from B to A. (" << A+diff << ", " << B-diff << ", " << C << ")" << endl;
-    }
-
-    //C --> B
-    if((C+B) > b_cap){
-        diff = b_cap-B;
-    }else{
-        diff = C;
-    }
-    if(has_solution(A, B+diff, C-diff) && !result){
-        result = true;
-        //cout << "Pour " << diff << " gallons from C to B. (" << A << ", " << B+diff << ", " << C-diff << ")" << endl;
-    }
-
-    //A --> B
-    if((A+B) > b_cap){
-        diff = b_cap-B;
-    }else{
-        diff = A;
-    }
-    if(has_solution(A-diff, B+diff, C) && !result){
-        result = true;
-        //cout << "Pour " << diff << " gallons from A to B. (" << A-diff << ", " << B+diff << ", " << C << ")" << endl;
-    }
-
-    //B --> C
-    if((B+C) > c_cap){
-        diff = c_cap-C;
-    }else{
-        diff = B;
-    }
-    if(has_solution(A, B-diff, C+diff) && !result){
-        result = true;
-        //cout << "Pour " << diff << " gallons from B to C. (" << A << ", " << B-diff << ", " << C+diff << ")" << endl;
-    }
-
-    //A --> C
-    if((A+C) > c_cap){
-        diff = c_cap-C;
-    }else{
-        diff = A;
-    }
-    if(has_solution(A-diff, B, C+diff) && !result){
-        result = true;
-        //cout << "Pour " << diff << " gallons from A to C. (" << A-diff << ", " << B << ", " << C+diff << ")" << endl;
-    }
-
-    return result;
-}
-
-bool getNext(int A, int B, int C){
-	/**
-	 * Add the current combo to the queue if it hasn't been checked yet
-	 * Find the next possible combo and recurse
-	 */
-	if((A==a_goal) && (B=b_goal) && (C==c_goal)){
+	if(find(checked.begin(), checked.end(), V) != checked.end()){
+		//this state has been checked before
 		return true;
 	}
-	vector<int> combo;
-	combo.push_back(C);
-    combo.push_back(B);
-    combo.push_back(A);
-    if(find(checked.begin(), checked.end(), combo) != checked.end()){
-    	//this combo has been checked before
-    	//cout << "(" << A << ", " << B << ", " << C << ") has been checked before." << endl;
-	    return false;
-    }
-    Vertex V(A, B, C);
-    bfsQ.push(V);
-    checked.push_back(combo);
+	return false;
+}
 
-    //C --> A
+vector<int> state_to_vector(State state){
+	/**
+	 * Convert a State object to a integer vector to add to the "checked" vector
+	 */
+	vector<int> V;
+	V.push_back(state.a_);
+	V.push_back(state.b_);
+	V.push_back(state.c_);
+	return V;
+}
+
+void add_next_to_queue(State state){
+	/**
+	 * Given a State object:
+	 * Check if it has been checked before, if it has do nothing
+	 * Find all next possible states and add any that haven't been checked yet to the queue
+	 */
+	vector<int> V = state_to_vector(state);
+	if(already_checked(V)){
+		//state has been checked before so don't do anything with it
+		return;
+	}
+	checked.push_back(V);//it hasn't been checked so add that it has
+
+	//for convenience
+	int A = state.a_;
+	int B = state.b_;
+	int C = state.c_;
+
+	//C --> A
     int diff1;
     if((A+C) > a_cap){
         //all of C can't be poured into A
@@ -226,8 +163,6 @@ bool getNext(int A, int B, int C){
         //all of C can be poured into A
         diff1 = C;
     }
-    Vertex V1(A+diff1, B, C-diff1);
-
     //B --> A
     int diff2;
     if((B+A) > a_cap){
@@ -235,8 +170,6 @@ bool getNext(int A, int B, int C){
     }else{
         diff2 = B;
     }
-    Vertex V2(A+diff2, B-diff2, C);
-
     //C --> B
     int diff3;
     if((C+B) > b_cap){
@@ -244,8 +177,6 @@ bool getNext(int A, int B, int C){
     }else{
         diff3 = C;
     }
-    Vertex V3(A, B+diff3, C-diff3);
-
     //A --> B
     int diff4;
     if((A+B) > b_cap){
@@ -253,8 +184,6 @@ bool getNext(int A, int B, int C){
     }else{
         diff4 = A;
     }
-    Vertex V4(A-diff4, B+diff4, C);
-
     //B --> C
     int diff5;
     if((B+C) > c_cap){
@@ -262,8 +191,6 @@ bool getNext(int A, int B, int C){
     }else{
         diff5 = B;
     }
-    Vertex V5(A, B-diff5, C+diff5);
-
     //A --> C
     int diff6;
     if((A+C) > c_cap){
@@ -271,82 +198,99 @@ bool getNext(int A, int B, int C){
     }else{
         diff6 = A;
     }
-    Vertex V6(A-diff6, B, C+diff6);
 
-    /*bfsQ.push(V1);
-    bfsQ.push(V2);
-    bfsQ.push(V3);
-    bfsQ.push(V4);
-    bfsQ.push(V5);
-    bfsQ.push(V6);*/
-    //get the next ones for them all
-    if(getNext(V1.A, V1.B, V1.C)){
-    	solution.push(V1);
-    	//return true;
+    //handle plurality of gallon VS gallons
+    ostringstream step1, step2, step3, step4, step5, step6;
+    string plurality1 = "";
+    if(diff1 > 1){
+    	plurality1 = "s";
     }
-    if(getNext(V2.A, V2.B, V2.C)){
-        solution.push(V2);
-        //return true;
+    string plurality2 = "";
+    if(diff2 > 1){
+       	plurality2 = "s";
     }
-    if(getNext(V3.A, V3.B, V3.C)){
-        solution.push(V3);
-        //return true;
+    string plurality3 = "";
+    if(diff3 > 1){
+       	plurality3 = "s";
     }
-    if(getNext(V4.A, V4.B, V4.C)){
-        solution.push(V4);
-        //return true;
+    string plurality4 = "";
+    if(diff4 > 1){
+       	plurality4 = "s";
     }
-    if(getNext(V5.A, V5.B, V5.C)){
-        solution.push(V5);
-        //return true;
+    string plurality5 = "";
+    if(diff5 > 1){
+       	plurality5 = "s";
     }
-    if(getNext(V6.A, V6.B, V6.C)){
-        solution.push(V6);
-        //return true;
+    string plurality6 = "";
+    if(diff6 > 1){
+       	plurality6 = "s";
     }
-    return false;
+
+    //The step instructions to add to the State objects
+    step1 << "Pour " << diff1 << " gallon" << plurality1 << " from C to A. (" << (A+diff1) << ", " << B         << ", " << (C-diff1) << ")";
+    step2 << "Pour " << diff2 << " gallon" << plurality2 << " from B to A. (" << (A+diff2) << ", " << (B-diff2) << ", " << C         << ")";
+    step3 << "Pour " << diff3 << " gallon" << plurality3 << " from C to B. (" << A         << ", " << (B+diff3) << ", " << (C-diff3) << ")";
+    step4 << "Pour " << diff4 << " gallon" << plurality4 << " from A to B. (" << (A-diff4) << ", " << (B+diff4) << ", " << C         << ")";
+    step5 << "Pour " << diff5 << " gallon" << plurality5 << " from B to C. (" << A         << ", " << (B-diff5) << ", " << (C+diff5) << ")";
+    step6 << "Pour " << diff6 << " gallon" << plurality6 << " from A to C. (" << (A-diff6) << ", " << B         << ", " << (C+diff6) << ")";
+
+    //create the State objects
+    State S1(A+diff1, B, C-diff1, state.get_steps(), step1.str());
+    State S2(A+diff2, B-diff2, C, state.get_steps(), step2.str());
+    State S3(A, B+diff3, C-diff3, state.get_steps(), step3.str());
+    State S4(A-diff4, B+diff4, C, state.get_steps(), step4.str());
+    State S5(A, B-diff5, C+diff5, state.get_steps(), step5.str());
+    State S6(A-diff6, B, C+diff6, state.get_steps(), step6.str());
+
+    //create integer vectors
+    vector<int> V1 = state_to_vector(S1);
+    vector<int> V2 = state_to_vector(S2);
+    vector<int> V3 = state_to_vector(S3);
+    vector<int> V4 = state_to_vector(S4);
+    vector<int> V5 = state_to_vector(S5);
+    vector<int> V6 = state_to_vector(S6);
+
+    //add any positions that haven't been checked yet to the queue
+    if(!already_checked(V1))
+    	bfsQ.push(S1);
+    if(!already_checked(V2))
+    	bfsQ.push(S2);
+    if(!already_checked(V3))
+    	bfsQ.push(S3);
+    if(!already_checked(V4))
+    	bfsQ.push(S4);
+    if(!already_checked(V5))
+    	bfsQ.push(S5);
+    if(!already_checked(V6))
+    	bfsQ.push(S6);
+    return;
 }
 
-bool BFS(){
-	getNext(0, 0, c_cap);//populate the queue
-	/*
-    while(!bfsQ.empty()){
-		//Vertex V = bfsQ.front();
-		bfsQ.pop();
-		//cout << "(" << V.A << ", " << V.B << ", " << V.C << ")" << endl;
+vector<string> bfs(){
+    /**
+     * Runs a breadth first search and builds a vector of steps to a solution
+     * Returns a vector of strings of steps for the solution
+     */
+	vector<string> steps;//to store the steps
+	//the first line
+	ostringstream init;
+	init << "Initial state. (0, 0, " << c_cap << ")";
+	steps.push_back(init.str());
+	State initial(0, 0, c_cap, steps, "");
+	bfsQ.push(initial);
+
+	while(bfsQ.size()>0){
+		State current = bfsQ.front();//get the front of the queue
+		if(current.is_goal()){
+			//if this is the goal then stop
+			steps =  current.get_steps();
+			break;
+		}
+		add_next_to_queue(current);//get the next steps and add the appropriate ones to the queue
+		bfsQ.pop();//pop off the front of the queue
 	}
-    */
-    while(!solution.empty()){
-        Vertex V = solution.top();
-        solution.pop();
-        cout << "(" << V.A << ", " << V.B << ", " << V.C << ")" << endl;
-    }
-	return true;
+	return steps;
 }
-
-void bfs(){
-	/**
-	 * In class explanation
-	 * 	Put initial state on queue
-	 * 	While queue is not empty
-	 * 		Let head of queue be 'current'
-	 * 		Generate all successors of current
-	 * 		For each one:
-	 * 			Check if it's the goal
-	 * 			Check if it's been seen before
-	 * 			If not, push on queue
-	 * 		Pop head of queue
-	 */
-}
-
-/**
- * To keep track of steps
- * 	class State
- * 		int a_, b_, c_;
- * 		vector<string> directions;
- * 		Each state will have the jug values and a list of how to get to that specific state through BFS
- * 		WHen you get to the goal just iterate over the vector and print it all out
- */
 
 int main(int argc, char * const argv[]){
     if (argc != 7) {
@@ -369,30 +313,22 @@ int main(int argc, char * const argv[]){
     a_goal = arr[3];
     b_goal = arr[4];
     c_goal = arr[5];
-    //cout << "Going for goal(" << a_goal << ", " << b_goal << ", " << c_goal << ")" << endl;
-    /*
-    if(!dfs(0, 0, arr[2])){
-        cout << "No solution." << endl;
-        return 0;
+
+    //get the steps to solve it as a vector of strings
+    vector<string> steps = bfs();
+    vector<string>::const_iterator step;
+    ostringstream resp;
+    //figure out what the steps are as an oss
+    for (step = steps.begin(); step != steps.end(); ++step) {
+    	resp << *step << "\n";
     }
-    */
-    if(!has_solution(0, 0, c_cap)){
-    	cout << "No solution." << endl;
-    	return 0;
-    }else{
-    	cout << "Initial state. (0, 0, " << c_cap << ")" << endl;
-    	if((a_goal==0) && (b_goal==0)){
-    		return 0;
-    	}
-    	BFS();
-    	while(solution.size()!=0){
-    		//Vertex V = solution.top();
-    		solution.pop();
-    		//cout << "(" << V.A << ", " << V.B << ", " << V.C << ")" << endl;
-    	}
+    ostringstream res;
+    res << "Initial state. (0, 0, " << c_cap << ")\n";
+    //if there's one step and it's not the goal, say there's no solution
+    if((resp.str()==res.str()) && (a_goal!=0) && (b_goal!=0)){
+        cout << "No solution." << endl;
+    }else{//otherwise print the steps
+        cout << resp.str();
     }
     return 0;
 }
-
-
-
