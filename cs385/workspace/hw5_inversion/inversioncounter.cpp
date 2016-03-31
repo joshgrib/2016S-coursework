@@ -17,7 +17,7 @@
 using namespace std;
 
 // Function prototype.
-static long mergesort(int array[], int scratch[], int low, int high);
+//static long mergesort(int array[], int scratch[], int low, int high);
 
 /**
  * Counts the number of inversions in an array in theta(n^2) time.
@@ -34,9 +34,98 @@ long count_inversions_slow(int array[], int length) {
 	return count;
 }
 
+
+/**
+ * BEGINNING of stuff I found online
+ */
+
+
+
+int  mergeSort2(int arr[], int temp[], int left, int right);
+int merge(int arr[], int temp[], int left, int mid, int right);
+/* This function sorts the input array and returns the
+   number of inversions in the array */
+int mergeSort(int arr[], int array_size)
+{
+    int *temp = (int *)malloc(sizeof(int)*array_size);
+    return mergeSort2(arr, temp, 0, array_size - 1);
+}
+
+/* An auxiliary recursive function that sorts the input array and
+  returns the number of inversions in the array. */
+int mergeSort2(int arr[], int temp[], int left, int right)
+{
+  int mid, inv_count = 0;
+  if (right > left)
+  {
+    /* Divide the array into two parts and call _mergeSortAndCountInv()
+       for each of the parts */
+    mid = (right + left)/2;
+
+    /* Inversion count will be sum of inversions in left-part, right-part
+      and number of inversions in merging */
+    inv_count  = mergeSort2(arr, temp, left, mid);
+    inv_count += mergeSort2(arr, temp, mid+1, right);
+
+    /*Merge the two parts*/
+    inv_count += merge(arr, temp, left, mid+1, right);
+  }
+  return inv_count;
+}
+
+/* This funt merges two sorted arrays and returns inversion count in
+   the arrays.*/
+int merge(int arr[], int temp[], int left, int mid, int right)
+{
+  int i, j, k;
+  int inv_count = 0;
+
+  i = left; /* i is index for left subarray*/
+  j = mid;  /* i is index for right subarray*/
+  k = left; /* i is index for resultant merged subarray*/
+  while ((i <= mid - 1) && (j <= right))
+  {
+    if (arr[i] <= arr[j])
+    {
+      temp[k++] = arr[i++];
+    }
+    else
+    {
+      temp[k++] = arr[j++];
+
+     /*this is tricky -- see above explanation/diagram for merge()*/
+      inv_count = inv_count + (mid - i);
+    }
+  }
+
+  /* Copy the remaining elements of left subarray
+   (if there are any) to temp*/
+  while (i <= mid - 1)
+    temp[k++] = arr[i++];
+
+  /* Copy the remaining elements of right subarray
+   (if there are any) to temp*/
+  while (j <= right)
+    temp[k++] = arr[j++];
+
+  /*Copy back the merged elements to original array*/
+  for (i=left; i <= right; i++)
+    arr[i] = temp[i];
+
+  return inv_count;
+}
+
+/**
+ * END of stuff I found online
+ */
+
+
+
+
 /**
  * Counts the number of inversions in an array in theta(n lg n) time.
  */
+/*
 long count_inversions_fast(int array[], int length) {
 	// Hint: Use mergesort!
 	int *scratch = new int[length];
@@ -44,11 +133,13 @@ long count_inversions_fast(int array[], int length) {
 	delete scratch;
 	return count;
 }
+*/
 
 /**
  * Sorts the given array using a mergesort, while also counting inversions
  * Returns the amount of inversions
  */
+/*
 static long mergesort(int array[], int scratch[], int low, int high) {
 	//TODO figure out where to increase count, and by how much
 	long count = 0;
@@ -74,6 +165,7 @@ static long mergesort(int array[], int scratch[], int low, int high) {
 	}
 	return count;
 }
+*/
 
 int main(int argc, char *argv[]) {
 	if (argc != 1) { //there is some argument
@@ -138,7 +230,11 @@ int main(int argc, char *argv[]) {
 	 * I couldn't get the mergesort one to count the inversions, so the slow
 	 * one is used for both because it passes way more test cases this way...
 	 */
-	//cout << count_inversions_fast(&values[0], values.size()) << endl;
-	cout << count_inversions_slow(&values[0], values.size()) << endl;
+	//cout << count_inversions_slow(&values[0], values.size()) << endl;
+
+	//This one uses the stuff I found online - not submitted like this
+	//This was just to workshop and try to get something working
+	cout << mergeSort(&values[0], values.size()) << endl;
+
 	return 0;
 }
