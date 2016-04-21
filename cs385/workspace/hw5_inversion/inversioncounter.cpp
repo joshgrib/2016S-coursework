@@ -17,7 +17,7 @@
 using namespace std;
 
 // Function prototype.
-//static long mergesort(int array[], int scratch[], int low, int high);
+static long mergesort(int array[], int scratch[], int low, int high);
 
 /**
  * Counts the number of inversions in an array in theta(n^2) time.
@@ -125,7 +125,7 @@ int merge(int arr[], int temp[], int left, int mid, int right)
 /**
  * Counts the number of inversions in an array in theta(n lg n) time.
  */
-/*
+
 long count_inversions_fast(int array[], int length) {
 	// Hint: Use mergesort!
 	int *scratch = new int[length];
@@ -133,15 +133,14 @@ long count_inversions_fast(int array[], int length) {
 	delete scratch;
 	return count;
 }
-*/
+
 
 /**
  * Sorts the given array using a mergesort, while also counting inversions
  * Returns the amount of inversions
  */
-/*
+
 static long mergesort(int array[], int scratch[], int low, int high) {
-	//TODO figure out where to increase count, and by how much
 	long count = 0;
 	if (low < high) {
 		int mid = low + ((low + high) / 2);
@@ -154,9 +153,9 @@ static long mergesort(int array[], int scratch[], int low, int high) {
 				scratch[k] = array[L];
 				L++;
 			} else {
+                count += mid - L +1;
 				scratch[k] = array[H];
 				H++;
-				count += (mid - k);
 			}
 		}
 		for (int k = low; k < high; k++) { //copy the new array over
@@ -165,7 +164,7 @@ static long mergesort(int array[], int scratch[], int low, int high) {
 	}
 	return count;
 }
-*/
+
 
 int main(int argc, char *argv[]) {
 	if (argc != 1) { //there is some argument
@@ -221,7 +220,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	cout << "Number of inversions: ";
-	if (argc == 2) { //slow mode because there is an input which is already checked
+	if (argc > 1) { //slow mode because there is an input which is already checked
 		cout << count_inversions_slow(&values[0], values.size()) << endl;
 		return 0;
 	}
@@ -230,11 +229,11 @@ int main(int argc, char *argv[]) {
 	 * I couldn't get the mergesort one to count the inversions, so the slow
 	 * one is used for both because it passes way more test cases this way...
 	 */
-	//cout << count_inversions_slow(&values[0], values.size()) << endl;
+	cout << count_inversions_fast(&values[0], values.size()) << endl;
 
 	//This one uses the stuff I found online - not submitted like this
 	//This was just to workshop and try to get something working
-	cout << mergeSort(&values[0], values.size()) << endl;
+	//cout << mergeSort(&values[0], values.size()) << endl;
 
 	return 0;
 }
