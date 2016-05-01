@@ -72,14 +72,41 @@ vector<Item> parse_file(string filename){
 	return items;
 }
 
+void print_items(vector<Item> items, int item_count){
+	/**
+	 * Given a vector of items and the size of the vector
+	 * Print out all the items in order
+	 */
+	for(int i=0; i<item_count; ++i){
+		cout << "   " << items.at(i) << endl;
+	}
+}
+
+void print_weight_value(vector<Item> items, int item_count){
+	/**
+	 * Given a vector of items and the size of the vector
+	 * Print the total weight and value of the items
+	 */
+	int weight = 0;
+	int value = 0;
+	for(int i=0; i<item_count; ++i){
+		weight += items.at(i).weight;
+		value += items.at(i).value;
+	}
+	cout << "Total weight: " << weight << " pounds" << endl;
+	cout << "Total value : $" << value << endl;
+}
+
 int max(int a, int b){
+	/**
+	 * Return the max of two integers
+	 */
 	if(a>b)
 		return a;
 	return b;
 }
 
-vector<int> compute_knapsack(const int weight, vector<Item> items, const int item_count){
-	vector<int> results;
+vector<Item> compute_knapsack(const int weight, vector<Item> items, const int item_count){
 	//generate blank 2D array
 	int **arr = new int*[item_count+1];
 	for(int i=0; i<=item_count; ++i){
@@ -91,6 +118,33 @@ vector<int> compute_knapsack(const int weight, vector<Item> items, const int ite
 			}
 		}
 	}
+	for(int i=1; i<=item_count; ++i){
+		int i_weight = items.at(i-1).weight;
+		int i_value = items.at(i-1).value;
+		for(int j=1; j<=weight; ++j){
+			int cell_value;
+			int use_it = arr[i-1][j];
+			int lose_it = i_value + arr[i-1][j-i_weight];
+			if(j>=i_weight){
+				cell_value = max(use_it, lose_it);
+			}else{
+				cell_value = lose_it;
+			}
+			arr[i][j] = cell_value;
+		}
+	}
+	//backtrack for answers
+	vector<Item> result;
+	int i = weight;
+	int j = item_count;
+	while(i>0){//I don't think I need j here too
+		if(arr[i][j] > arr[i-1][j]){//add an item
+			cout << "Adding " << items.at(i-1) << endl;
+			result.push_back(items.at(i-1));
+			j = j-items.at(i-1).weight;
+		}
+		i--;
+	}
 	for(int i=0; i<=item_count; ++i){
 		for(int j=0; j<=weight; ++j){
 			cout << arr[i][j] << " ";
@@ -98,45 +152,11 @@ vector<int> compute_knapsack(const int weight, vector<Item> items, const int ite
 		cout << endl;
 	}
 
-	/*
-	int *weights = new int[item_count];
-	int *values = new int[item_count];
-	int *item_arr = new int[item_count];
-	for(int i=0; i<item_count-1; i++){
-		Item this_item = items.at(item_count);
-		item_arr[item_count] = this_item.item_number;
-		weights[item_count] = this_item.weight;
-		values[item_count] = this_item.value;
-	}
-	int **arr = new int*[item_count];
-	for(int i = 0; i < item_count; ++i) {
-	    arr[i] = new int[weight];
-	    for(int j=0; j<weight; j++){
-	    	if( (i==0) || (j==0)){
-	    		arr[i][j]=0;
-	    	}else if(weights[i-1] <= j){
-	    		arr[i][j] = max( (values[i-1] + arr[i-1][j-weights[i-1]]), arr[i-1][j]);
-	    	}else{
-	    		arr[i][j] = arr[i-1][j];
-	    	}
-	    }
-	}
-	for(int i=0; i<item_count; i++){
-		for(int j=0; j<weight; j++){
-			cout << arr[i][j] << " " << endl;
-		}
-		cout << endl;
-	}
-	//backtrack for solution
-	//clean up stuff
-	for(int i = 0; i < item_count; ++i) {
+	for(int i = 0; i <= item_count; ++i) {
 	    delete [] arr[i];
 	}
 	delete [] arr;
-	delete weights;
-	delete values;
-	*/
-	return results;
+	return result;
 }
 
 int main(int argc, char *argv[]) {
@@ -145,8 +165,8 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 	istringstream iss(argv[1]);
-	int input;
-	if ( (!(iss >> input)) || (input < 0) ) {	//letter input
+	int capacity;
+	if ( (!(iss >> capacity)) || (capacity < 0) ) {	//letter input
 		cerr << "Error: Bad value '" << argv[1] << "' for capacity." << endl;
 		return 1;
 	}
@@ -157,7 +177,13 @@ int main(int argc, char *argv[]) {
 	}
 	//convert file to vector of 'Item's
 	vector<Item> items = parse_file(argv[2]);
+	cout << "Candidate items to place in knapsack:" << endl;
+	print_items(items, items.size());
+	cout << "Capacity: " << capacity << " pounds" << endl;
 	//get the item numbers of the solution
-	vector<int> solution_item_numbers = compute_knapsack(input, items, items.size());
+	vector<Item> solution_items = compute_knapsack(capacity, items, items.size());
+	cout << "Items to place in knapsack:" << endl;
+	print_items(solution_items, solution_items.size());
+	print_weight_value(solution_items, solution_items.size());
 	return 0;
 }
