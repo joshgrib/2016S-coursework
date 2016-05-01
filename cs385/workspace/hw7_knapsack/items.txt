@@ -1,0 +1,5 @@
+book,3,35
+old laptop,2,40
+cheesecake,5,50
+boots,4,10
+headphones,1,30
