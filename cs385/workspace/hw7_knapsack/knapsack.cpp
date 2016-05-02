@@ -2,7 +2,7 @@
  * Name        : knapsack.cpp
  * Author      : Josh Gribbon
  * Version     : 1.0
- * Date        :
+ * Date        : 5-1-16
  * Description : KNapsack problem
  * Pledge      : I pledge my honor I have abided by the Stevens Honor System.
  ******************************************************************************/
@@ -14,7 +14,7 @@
 using namespace std;
 
 struct Item {
-	unsigned int item_number, weight, value;
+	int item_number, weight, value;
 	string description;
 	explicit Item(const unsigned int item_number, const unsigned int weight,
 			const unsigned int value, const string &description) :
@@ -51,19 +51,31 @@ vector<Item> parse_file(string filename){
 	ifstream infile(filename.c_str());
 	vector<Item> items;
 	string description, weight_s, value_s;
-	int weight, value;
+	int weight=0, value=0;
 	int count = 1;
 	string line;
 	while(getline(infile, line)){
 		vector<string> itemParts;
 		itemParts= splitLine(line, ',');
 		//get strings from the vector
+		if(itemParts.size() != 3){
+			cerr << "Error: Line number " << count << " does not contain 3 fields." << endl;
+			throw exception();
+		}
 		description = itemParts.at(0);
 		weight_s = itemParts.at(1);
 		value_s = itemParts.at(2);
 		//convert to ints
-		istringstream(weight_s) >> weight;
-		istringstream(value_s) >> value;
+		istringstream iss_w(weight_s);
+		 if(!iss_w >> weight){
+			 cerr << "Error: Invalid weight '" << iss_w << "' on line number " << count << "." << endl;
+			 throw exception();
+		 }
+		istringstream iss_v(value_s);
+		 if(!iss_v >> value){
+			 cerr << "Error: Invalid value '" << iss_v << "' on line number " << count << "." << endl;
+			 throw exception();
+		 }
 		//make item and add to vector
 		Item thisItem(count, weight, value, description);
 		items.push_back(thisItem);
@@ -107,51 +119,46 @@ int max(int a, int b){
 }
 
 vector<Item> compute_knapsack(const int weight, vector<Item> items, const int item_count){
-	//generate blank 2D array
+	//generate 2D array
 	int **arr = new int*[item_count+1];
 	for(int i=0; i<=item_count; ++i){
 		arr[i] = new int[weight+1];
-		arr[i][0] = 0;//fill leftmost column with zeros
-		if(i==0){
-			for(int j=0; j<weight; ++j){
-				arr[0][j] = 0;//fill top row with zeros
-			}
-		}
-	}
-	for(int i=1; i<=item_count; ++i){
-		int i_weight = items.at(i-1).weight;
-		int i_value = items.at(i-1).value;
-		for(int j=1; j<=weight; ++j){
-			int cell_value;
-			int use_it = arr[i-1][j];
-			int lose_it = i_value + arr[i-1][j-i_weight];
-			if(j>=i_weight){
-				cell_value = max(use_it, lose_it);
+		for(int j=0; j<=weight; j++){
+			if( (i==0) || (j==0)){
+				arr[i][j] = 0;
+			}else if (items.at(i-1).weight <= j){
+				arr[i][j] = max( (items.at(i-1).value + arr[i-1][j-items.at(i-1).weight]), arr[i-1][j]);
 			}else{
-				cell_value = lose_it;
+				arr[i][j] = arr[i-1][j];
 			}
-			arr[i][j] = cell_value;
 		}
 	}
 	//backtrack for answers
-	vector<Item> result;
+	vector<Item> result, temp;
 	int i = weight;
 	int j = item_count;
 	while(i>0){//I don't think I need j here too
 		if(arr[i][j] > arr[i-1][j]){//add an item
-			cout << "Adding " << items.at(i-1) << endl;
-			result.push_back(items.at(i-1));
+			//cout << "Adding " << items.at(i-1) << endl;
+			temp.push_back(items.at(i-1));
 			j = j-items.at(i-1).weight;
 		}
 		i--;
 	}
+	vector<Item>::iterator it=temp.end();
+	while(it != temp.begin()){
+		result.push_back(*(--it));
+	}
+	//print out array
+	/*
 	for(int i=0; i<=item_count; ++i){
 		for(int j=0; j<=weight; ++j){
 			cout << arr[i][j] << " ";
 		}
 		cout << endl;
 	}
-
+	*/
+	//cleanup
 	for(int i = 0; i <= item_count; ++i) {
 	    delete [] arr[i];
 	}
@@ -176,7 +183,13 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 	//convert file to vector of 'Item's
-	vector<Item> items = parse_file(argv[2]);
+	vector<Item> items;
+	try{
+		items = parse_file(argv[2]);
+	}
+	catch(...){
+		return 1;
+	}
 	cout << "Candidate items to place in knapsack:" << endl;
 	print_items(items, items.size());
 	cout << "Capacity: " << capacity << " pounds" << endl;
