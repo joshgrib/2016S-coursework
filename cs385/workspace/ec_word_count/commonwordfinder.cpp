@@ -5,12 +5,6 @@
  *      Author: josh
  */
 
-/**
- * PROBLEMS
- * 1)Words within the same count are not alphabetized
- * 2)Because top words are gotten before alphabetizing,
- *   they're not always the right ones
- */
 #include "rbtree.h"
 #include <iostream>
 #include <sstream>
@@ -24,9 +18,15 @@
 using namespace std;
 
 struct node{
+	/*
+	 * Represents a node for the tree and vetors
+	 */
 	int count;
 	string description;
 	int operator< (const node& other) const{
+		/*
+		 * Sort based on count and then description
+		 */
 		if(count==other.count){
 			return other.description < description;
 		}else{
@@ -102,6 +102,7 @@ int main(int argc, char *argv[]) {
 	}
 	RedBlackTree<string, int> *rbt = new RedBlackTree<string, int>();
 	vector<string> words = get_words(argv[1]);
+
 	//put words into tree and get counts of each
 	while(words.size()!=0){
 		string word = words.back();
@@ -112,6 +113,7 @@ int main(int argc, char *argv[]) {
 			rbt->insert(word, 1);
 		}
 	}
+
 	//traverse tree and put in vector
 	typename RedBlackTree<string, int>::iterator it = rbt->begin();
 	vector<node> word_nodes;
@@ -122,11 +124,13 @@ int main(int argc, char *argv[]) {
 		word_nodes.push_back(myN);
 	    ++it;
 	}
+
 	//sort vector by count and then by description
 	sort(word_nodes.begin(), word_nodes.end());
 	cout << "Total unique words: " << word_nodes.size() << endl;
 	vector<node> toPrint;
 	unsigned int biggest_word_length = 0;
+
 	//take the amount of nodes to print and put them in a new vector
 	for(int i=1; (i<=limit && (unsigned int)i<=rbt->size()); i++){
 		//get the nodes to print and find the longest word to print
@@ -137,6 +141,7 @@ int main(int argc, char *argv[]) {
 		}
 		toPrint.push_back(thisN);
 	}
+
 	//get digits in limit
 	int digits = 0;
 	int num = limit;
@@ -149,6 +154,7 @@ int main(int argc, char *argv[]) {
 	}
 	reverse(toPrint.begin(), toPrint.end());
 	int count = 1;
+
 	//print out the words
 	while(toPrint.size()!=0){
 		node thisN = toPrint.back();
