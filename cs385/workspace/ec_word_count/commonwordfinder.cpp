@@ -66,6 +66,7 @@ int main(int argc, char *argv[]) {
 			rbt->insert(word, 1);
 		}
 	}
+	//traverse tree and put in priority queue
 	cout << "Total unique words: " << rbt->size() << endl;
 	//get digits in limit
 	int digits = 0;
