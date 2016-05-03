@@ -26,8 +26,13 @@ using namespace std;
 struct node{
 	int count;
 	string description;
-	int operator< (const node& other) const
-	{return count < other.count;}
+	int operator< (const node& other) const{
+		if(count==other.count){
+			return other.description < description;
+		}else{
+			return count < other.count;
+		}
+	}
 };
 
 vector<string> get_words(string filename){
@@ -74,18 +79,8 @@ void printLine(int count, string word, int word_count, int biggest_word_length, 
 	cout << endl;
 }
 
-bool sort_nodes( node const &first, node const &second )
-{
-   if (first.count < second.count)
-      return true;
-   else if (second.count < first.count)
-      return false;
-   else{//equal
-      return first.description  < second.description;
-   }
-}
-
 int main(int argc, char *argv[]) {
+	//parse CLAs
 	if(argc != 2 && argc != 3){
 		cerr << "Usage: ./commonwordfinder <filename> [limit]" << endl;
 		return 1;
@@ -107,7 +102,7 @@ int main(int argc, char *argv[]) {
 	}
 	RedBlackTree<string, int> *rbt = new RedBlackTree<string, int>();
 	vector<string> words = get_words(argv[1]);
-	//put words into tree
+	//put words into tree and get counts of each
 	while(words.size()!=0){
 		string word = words.back();
 		words.pop_back();
@@ -117,27 +112,26 @@ int main(int argc, char *argv[]) {
 			rbt->insert(word, 1);
 		}
 	}
-	//traverse tree and put in priority queue
+	//traverse tree and put in vector
 	typename RedBlackTree<string, int>::iterator it = rbt->begin();
-	priority_queue<node> PQ;
+	vector<node> word_nodes;
 	while (it != rbt->end()) {
 		node myN;
 		myN.count = it->second;
 		myN.description = it->first;
-		PQ.push(myN);
+		word_nodes.push_back(myN);
 	    ++it;
 	}
-	cout << "Total unique words: " << rbt->size() << endl;
+	//sort vector by count and then by description
+	sort(word_nodes.begin(), word_nodes.end());
+	cout << "Total unique words: " << word_nodes.size() << endl;
 	vector<node> toPrint;
 	unsigned int biggest_word_length = 0;
-	/*get front "limit" nodes from the priority queue
-	 * put this in a vector
-	 * and find the biggest word length
-	 */
+	//take the amount of nodes to print and put them in a new vector
 	for(int i=1; (i<=limit && (unsigned int)i<=rbt->size()); i++){
 		//get the nodes to print and find the longest word to print
-		node thisN = PQ.top();
-		PQ.pop();
+		node thisN = word_nodes.back();
+		word_nodes.pop_back();
 		if(thisN.description.length() > biggest_word_length){
 			biggest_word_length = thisN.description.length();
 		}
@@ -150,28 +144,19 @@ int main(int argc, char *argv[]) {
 		num /= 10;
 		digits++;
 	}
+	if( (limit<10) || (toPrint.size()<10) ){
+		digits = 1;
+	}
 	reverse(toPrint.begin(), toPrint.end());
 	int count = 1;
-	while(toPrint.size()!=0 && count <= limit){
+	//print out the words
+	while(toPrint.size()!=0){
 		node thisN = toPrint.back();
 		toPrint.pop_back();
-		int word_count = thisN.count;
-		vector<string> sameCountWords;
-		while(toPrint.back().count == word_count){//next node is the same count as this one
-			sameCountWords.push_back(toPrint.back().description);
-			toPrint.pop_back();
-		}
-		sort(sameCountWords.rbegin(), sameCountWords.rend());
-		//reverse(sameCountWords.begin(), sameCountWords.end());
-		while(!sameCountWords.empty()){
-			string word = sameCountWords.back();
-			sameCountWords.pop_back();
-			printLine(count, word, word_count, biggest_word_length, digits);
-			count++;
-		}
 		printLine(count, thisN.description, thisN.count, biggest_word_length, digits);
 		count++;
 	}
+	//cleanup
 	delete rbt;
 	return 0;
 }
