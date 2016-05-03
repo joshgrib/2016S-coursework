@@ -4,6 +4,13 @@
  *  Created on: May 2, 2016
  *      Author: josh
  */
+
+/**
+ * PROBLEMS
+ * 1)Numbers are aligned based on the longest word in the file,
+ *   not based on the longest word printed
+ * 2)Words within the same count are not alphabetized
+ */
 #include "rbtree.h"
 #include <iostream>
 #include <sstream>
@@ -12,8 +19,16 @@
 #include <string>
 #include <fstream>
 #include <algorithm>
+#include <queue>
 
 using namespace std;
+
+struct node{
+	int count;
+	string description;
+	int operator< (const node& other) const
+	{return count < other.count;}
+};
 
 vector<string> get_words(string filename){
 	/*
@@ -46,13 +61,15 @@ int main(int argc, char *argv[]) {
 		cerr << "Error: Cannot open file '" << argv[1] << "' for input." << endl;
 		return 1;
 	}
-	unsigned int limit = 10;
+	int limit;
 	if(argc == 3){
 		istringstream iss(argv[2]);
-		if( !(iss >> limit) || (limit < 1) ){
+		if(!(iss >> limit) || (limit < 1)){
 			cerr << "Error: Invalid limit '" << argv[2] << "' received." << endl;
 			return 1;
 		}
+	}else{
+		limit = 10;
 	}
 	RedBlackTree<string, int> *rbt = new RedBlackTree<string, int>();
 	vector<string> words = get_words(argv[1]);
@@ -67,17 +84,40 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	//traverse tree and put in priority queue
+	typename RedBlackTree<string, int>::iterator it = rbt->begin();
+	priority_queue<node> PQ;
+	unsigned int biggest_word_length = 0;
+	while (it != rbt->end()) {
+		node myN;
+		myN.count = it->second;
+		myN.description = it->first;
+		if(myN.description.length() > biggest_word_length){
+			biggest_word_length = myN.description.length();
+		}
+		PQ.push(myN);
+	    ++it;
+	}
 	cout << "Total unique words: " << rbt->size() << endl;
 	//get digits in limit
 	int digits = 0;
-	unsigned int num = limit;
+	int num = limit;
 	while(num){
 		num /= 10;
 		digits++;
 	}
-	for(unsigned int i=1; (i<=limit && i<=rbt->size()); i++){
+	for(int i=1; (i<=limit && (unsigned int)i<=rbt->size()); i++){
 		cout << setw(digits) << i << ". ";
-		cout << "word #";
+		node thisN = PQ.top();
+		PQ.pop();
+		int digits2 = 0;
+		int num = thisN.count;
+		while(num){
+			num /= 10;
+			digits2++;
+		}
+		cout <<  thisN.description;
+		int offset = biggest_word_length - thisN.description.length() + (digits2+1);
+		cout << setw(offset) << thisN.count;
 		cout << endl;
 	}
 	delete rbt;
