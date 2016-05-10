@@ -1,0 +1,1 @@
+All the files are in the git repo, to use the website you would just "git clone" or download it, then open "index.html", or go to "http://www.tiebreaker.xyz"

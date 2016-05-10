@@ -19,7 +19,7 @@ using namespace std;
 
 struct node{
 	/*
-	 * Represents a node for the tree and vetors
+	 * Represents a node for the tree and vectors
 	 */
 	int count;
 	string description;
@@ -51,6 +51,7 @@ vector<string> get_words(string filename){
 		}
 		//make all letters lowercase
 		transform( word.begin(), word.end(), word.begin(), ::tolower);
+		//don't add if there's no characters
 		if(!(word==" " || word.empty())){
 			words.push_back(word);
 		}
@@ -82,7 +83,7 @@ void printLine(int count, string word, int word_count, int biggest_word_length, 
 int main(int argc, char *argv[]) {
 	//parse CLAs
 	if(argc != 2 && argc != 3){
-		cerr << "Usage: ./commonwordfinder <filename> [limit]" << endl;
+		cerr << "Usage: " << argv[0] << " <filename> [limit]" << endl;
 		return 1;
 	}
 	ifstream infile(argv[1]);
@@ -162,6 +163,7 @@ int main(int argc, char *argv[]) {
 		printLine(count, thisN.description, thisN.count, biggest_word_length, digits);
 		count++;
 	}
+
 	//cleanup
 	delete rbt;
 	return 0;
