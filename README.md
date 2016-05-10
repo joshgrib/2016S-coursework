@@ -38,6 +38,6 @@ Notes repo for Spring 2016 - Semester 4
 | 4 | 16S | CS334 - Automata and Computation             | 3 |  |
 | 4 | 16S | CS347 - Software Development Process         | 3 |  |
 | 4 | 16S | CS385 - Algorithms                           | 4 |  |
-| 4 | 16S | HHS479 - History of Technology Criticism     | 3 |  |
+| 4 | 16S | HHS479 - History of Technology Criticism     | 3 | A- |
 | 4 | 16S | HSS175 - Fundamentals of Psychology          | 3 |  |
-| 4 | 16S | PE200 - Archery                              | 0 |  |
+| 4 | 16S | PE200 - Archery                              | 0 | P |
